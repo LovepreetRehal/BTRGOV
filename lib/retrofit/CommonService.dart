@@ -1,10 +1,18 @@
+import 'dart:math';
+
+import 'package:btr_gov/model/FarmarDetailModel.dart';
+import 'package:btr_gov/model/LoginResponse.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class CommonService {
-  final String _baseUrl = 'YOUR_API_BASE_URL'; // Replace with your API base URL
+import '../model/ForgotResponse.dart';
 
-  Future<Map<String, dynamic>> login(String mobileNumber, String password, String department) async {
+class CommonService {
+  final String _baseUrl =
+      'https://api.learnwithchoudhary.com/api'; // Replace with your API base URL
+
+  Future<LoginResponse> login(
+      String mobileNumber, String password, String department) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/login'),
       headers: <String, String>{
@@ -14,32 +22,61 @@ class CommonService {
         'mobile_number': mobileNumber,
         'password': password,
         'department_code': department,
-        'email': '',
       }),
     );
 
+
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      print("login_response success: ${response.body}");
+      return LoginResponse.fromJson(jsonDecode(response.body));
     } else {
+      print("login_response error: ${response.toString()}");
       throw Exception('Failed to log in');
     }
   }
 
-  Future<void> forgotPassword(String mobileNumber) async {
+  Future<ForgotResponse> forgotPassword(String email, ) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/forgot-password'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'mobileNumber': mobileNumber,
+        'email': email,
+
       }),
     );
+    print("forgot_response common: ${response.body}");
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to send forgot password request');
+    if (response.statusCode == 200) {
+      print("forgot_response success: ${response.body}");
+      return ForgotResponse.fromJson(jsonDecode(response.body));
+    } else {
+      print("forgot_response error: ${response.toString()}");
+      throw Exception('Failed to log in');
     }
   }
+
+  Future<FarmarDetailModel> getFarmerDetail() async {
+    // final response = await http.get(Uri.parse('$_baseUrl/farmers/details/create'));
+    //
+    final response = await http.get(
+      Uri.parse('$_baseUrl/farmers/details/create'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    print("getFarmerDetail common: ${response.body}");
+
+    if (response.statusCode == 200) {
+      print("getFarmerDetail success: ${response.body}");
+      return FarmarDetailModel.fromJson(jsonDecode(response.body));
+    } else {
+      print("forgot_response error: ${response.toString()}");
+      throw Exception('Failed to log in');
+    }
+  }
+
 
   Future<void> addFarmer(Map<String, String> farmerData) async {
     final response = await http.post(

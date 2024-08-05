@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../retrofit/CommonService.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 
@@ -7,6 +9,7 @@ class AddFarmerScreen extends StatefulWidget {
 
   @override
   _AddFarmerState createState() => _AddFarmerState();
+
 }
 
 class _AddFarmerState extends State<AddFarmerScreen> {
@@ -14,6 +17,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
   String? _selectedBlock = 'All';
   String? _selectedVCDC = 'All';
   String? _selectedRevenueVillage = 'All';
+  bool _isLoading = false;
 
   String? _selectedValue = '--select--';
   final List<String> _selected = ['--select--'];
@@ -29,10 +33,55 @@ class _AddFarmerState extends State<AddFarmerScreen> {
     'Village 3'
   ];
 
+  Future<void> _getfarmerDetail() async {
+
+
+
+
+    try {
+      final commonService = Provider.of<CommonService>(context, listen: false);
+      final  response =
+      await commonService.getFarmerDetail();
+      print("forgot_response success: ${response.toString()}");
+
+      if (response.status!) {
+        // Handle successful login
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Success')));
+      } else {
+        // Show error message if login failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed : ${response.toString()}')),
+        );
+      }
+    } catch (e) {
+      print("forgot catch: ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed : ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _getfarmerDetail();  // Fetch farmer details when screen is opened
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         // appBar: AppBar(title: const Text('Farmer Detail')),
+
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: Padding(

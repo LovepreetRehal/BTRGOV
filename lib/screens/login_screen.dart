@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../model/LoginResponse.dart';
 import '../retrofit/CommonService.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
@@ -13,32 +16,47 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String? _selectedDepartments = '--Select--';
-
-  final List<String> _department = ['--Select--', 'AGRICULTURE', 'HORTICULTURE', 'IRRIGATION','DIARY','VETERINARY','FOOD &amp; CIVIL SUPPLIES','OTHERS'];
-
+  final List<String> _department = ['--Select--', 'AGRICULTURE', 'HORTICULTURE', 'IRRIGATION', 'DIARY', 'VETERINARY', 'FOOD & CIVIL SUPPLIES', 'OTHERS'];
   String _mobileNumber = '';
   String _password = '';
   bool _isLoading = false;
-
+  // TextEditingController instances
+  final TextEditingController _mobileNumberController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
+    if (_mobileNumber.isEmpty || _password.isEmpty || _selectedDepartments == '--Select--') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter all required fields')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
       final commonService = Provider.of<CommonService>(context, listen: false);
-      final response = await commonService.login(_mobileNumber, _password, _selectedDepartments ?? '');
+      final LoginResponse response = await commonService.login(
+        _mobileNumber,
+        _password,
+        _selectedDepartments ?? '',
+      );
+      print("login_response success: ${response.toString()}");
 
-      // Handle the response data as needed.
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      if (response.status!) {
+        // Handle successful login
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()),);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Success')));
+
+      } else {
+        // Show error message if login failed
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to log in: ${response.toString()}')),);
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to log in')),
-      );
+      print("login_response catch: ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to log in: ${e.toString()}')),);
     } finally {
       setState(() {
         _isLoading = false;
@@ -51,96 +69,99 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
-      backgroundColor: Colors.white, // Set the background color of the Scaffold
+      backgroundColor: Colors.white,
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Logo
               const SizedBox(height: 50),
               Image.asset(
-                'resources/image/BTRgov-logo.png', // Path to your logo
-                width: 100, // Adjust width as needed
-                height: 100, // Adjust height as needed
+                'resources/image/BTRgov-logo.png',
+                width: 100,
+                height: 100,
               ),
               const SizedBox(height: 20),
-
-              _buildTextField('Mobile Number :', 'Enter Mobile Number', '', (value) {
-                // Handle the changed text
-                print('Email changed: $value');
-                setState(() {
-                  _mobileNumber = value ?? '';
-                });
-              },),
-              const SizedBox(height: 16),
-              _buildTextField('Password :', 'Enter Password', '', (value) {
-                // Handle the changed text
-                print('Email changed: $value');
-                setState(() {
-                  _password = value ?? '';
-                });
-              },),
-
-              const SizedBox(height: 16),
-
-              _buildDropdown('Select Department', _selectedDepartments, _department, (String? newValue) {
-                setState(() {
-                  _selectedDepartments = newValue;
-                });
-              }),
-              const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),);
+              _buildTextField(
+                'Mobile Number :',
+                'Enter Mobile Number',
+                _mobileNumberController,
+                    (value) {
+                  setState(() {
+                    _mobileNumber = value ?? '';
+                  });
                 },
-                child: const Text('Forgot Password?'),
               ),
-              MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()),);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.green[800], // Text color
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6.0), // Border radius
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 12, // Font size
-                  fontWeight: FontWeight.w600, // Font weight
-                  letterSpacing: 1.5, // Letter spacing
-                ),
-              ).copyWith(
-                // Optionally, modify the button style for different states
-                // You can also use themes for more comprehensive styling
+              const SizedBox(height: 16),
+              _buildTextField(
+                'Password :',
+                'Enter Password',
+                _passwordController,
+                    (value) {
+                  setState(() {
+                    _password = value ?? '';
+                  });
+                },
               ),
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Log In'),
-            ),
-              // child: const Text('Log In'),
-            // ),
-      //
-      ),
-      ]),
+              const SizedBox(height: 16),
+              _buildDropdown(
+                'Select Department',
+                _selectedDepartments,
+                _department,
+                    (String? newValue) {
+                  setState(() {
+                    _selectedDepartments = newValue;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                      );
+                    },
+                    child: const Text('Forgot Password?'),
+                  ),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.green[800],
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text('Log In'),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
   Widget _buildTextField(
       String label,
       String hint,
-      String? initialValue,
+      TextEditingController controller,
       ValueChanged<String?> onChanged,
       ) {
     return Column(
@@ -163,14 +184,11 @@ class _LoginScreenState extends State<LoginScreen> {
             border: Border.all(color: Colors.grey),
           ),
           child: TextField(
-            controller: TextEditingController(text: initialValue),
-            style: const TextStyle(
-              fontSize: 14, // Set input text size
-            ),
+            controller: controller,
+            style: const TextStyle(fontSize: 14),
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hint,
-
             ),
             onChanged: onChanged,
           ),
@@ -179,9 +197,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
-  Widget _buildDropdown(String label, String? selectedValue, List<String> items,
-      ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(
+      String label,
+      String? selectedValue,
+      List<String> items,
+      ValueChanged<String?> onChanged,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,7 +216,6 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          // Make the container take the full width of its parent
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -206,7 +226,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: DropdownButton<String>(
               value: selectedValue,
               isExpanded: true,
-              // Make the dropdown take the full width of its container
               onChanged: onChanged,
               items: items.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
