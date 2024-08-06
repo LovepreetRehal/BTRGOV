@@ -9,39 +9,53 @@ class AddFarmerScreen extends StatefulWidget {
 
   @override
   _AddFarmerState createState() => _AddFarmerState();
-
 }
 
 class _AddFarmerState extends State<AddFarmerScreen> {
   String? _selectedSalutation = 'Mr';
-  String? _selectedBlock = 'All';
-  String? _selectedVCDC = 'All';
-  String? _selectedRevenueVillage = 'All';
+  String? _selectedCountry = 'India'; // Set initial value to match the list
+  String? _selectedFarmerCategories =
+      'FARMER_CAT_1'; // Set initial value to match the list
+  String? _selectedEducation = 'EDU_A'; // Set initial value to match the list
+  String? _selectedBplStatuses = 'Yes'; // Set initial value to match the list
+  String? _selectedPmKishans = 'Yes'; // Set initial value to match the list
+  String? _selectedOccupations =
+      'OCCUPATION_A'; // Set initial value to match the list
+  String? _selectedReligions = 'Hindu'; // Set initial value to match the list
+  String? _selectedSocialCategories =
+      'ST'; // Set initial value to match the list
+  String? _selectedState = 'Punjab'; // Set initial value to match the list
+  String? _selectedDistricts = 'Patiala'; // Set initial value to match the list
+  String? _selectedBlocks = 'All'; // Set initial value to match the list
+  String? _selectedIncome = 'Below 2000'; // Set initial value to match the list
+  String? _selectedVcdcs = 'All'; // Set initial value to m
+  String? _selectedRevenueVillages = 'All';
+
   bool _isLoading = false;
 
   String? _selectedValue = '--select--';
-  final List<String> _selected = ['--select--'];
+  final List<String> _selected = ['--select--','MALE','FEMALE','OTHER'];
 
-
+  final List<String> _countryList = ['India'];
+  final List<String> _farmerCategories = ['FARMER_CAT_1'];
+  final List<String> _education = ['EDU_A'];
+  final List<String> _bplStatuses = ['Yes', 'No'];
+  final List<String> _pmKishans = ['Yes', 'No'];
+  final List<String> _occupations = ['OCCUPATION_A'];
+  final List<String> _religions = ['Hindu', 'Christian', 'Muslim', 'Sikh', 'Buddhist', 'Jain', 'Other Religion',];
+  final List<String> _socialCategories = ['ST', 'SC', 'OBC', 'GEN',];
+  final List<String> _states = ['Punjab'];
+  final List<String> _districts = ['Patiala'];
+  final List<String> _blocks = ['All', 'BLOCKA'];
+  final List<String> _incomes = ['Below 2000', '2000 to 5000', '5000 to 8000', '8000 to 10,000', 'Above 10, 000',];
   final List<String> _salutation = ['Mr', 'Mrs', 'Late', 'Miss', 'Smt'];
-  final List<String> _blocks = ['All', 'Block 1', 'Block 2', 'Block 3'];
-  final List<String> _vcdcs = ['All', 'VCDC 1', 'VCDC 2', 'VCDC 3'];
-  final List<String> _revenueVillages = [
-    'All',
-    'Village 1',
-    'Village 2',
-    'Village 3'
-  ];
+  final List<String> _vcdcs = ['All', 'VCDC1', 'VCDC 2', 'VCDC 3'];
+  final List<String> _revenueVillages = ['All', 'Village 1', 'Village 2', 'Village 3'];
 
   Future<void> _getfarmerDetail() async {
-
-
-
-
     try {
       final commonService = Provider.of<CommonService>(context, listen: false);
-      final  response =
-      await commonService.getFarmerDetail();
+      final response = await commonService.getFarmerDetail();
       print("forgot_response success: ${response.toString()}");
 
       if (response.status!) {
@@ -67,15 +81,11 @@ class _AddFarmerState extends State<AddFarmerScreen> {
     }
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
-    _getfarmerDetail();  // Fetch farmer details when screen is opened
+    // _getfarmerDetail(); // Fetch farmer details when screen is opened
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +96,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
         body: SingleChildScrollView(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
-
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,7 +108,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
                     Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -110,7 +118,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   _buildDropdown(
                                       'Salutation',
                                       _selectedSalutation,
@@ -168,7 +175,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                       print('FamilyName changed: $value');
                                     },
                                   ),
-
                                   const SizedBox(height: 16),
                                   _buildTextField(
                                     'Mobile Number:',
@@ -199,12 +205,13 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     },
                                   ),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Gender:', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
+                                  _buildDropdown(
+                                      'Gender:', _selectedValue, _selected,
+                                      (String? newValue) {
+                                    setState(() {
+                                      _selectedValue = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
                                   _buildTextField(
                                     'Hornet Number (Max size: 10) :',
@@ -216,18 +223,24 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     },
                                   ),
                                   const SizedBox(height: 16),
-
-                                  _buildTextField('Monthly Family Income ✫ :', '', '', (value) {
+                                  _buildTextField(
+                                    'Monthly Family Income ✫ :',
+                                    '',
+                                    '',
+                                    (value) {
                                       // Handle the changed text
                                       print('MonthlyIncome changed: $value');
-                                    },),
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Monthly Family IncomeZ:', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
+                                  _buildDropdown(
+                                      'Monthly Family IncomeZ:',
+                                      _selectedIncome,
+                                      _incomes, (String? newValue) {
+                                    setState(() {
+                                      _selectedIncome = newValue;
+                                    });
+                                  }),
                                 ]))),
                     const SizedBox(height: 36),
                     const Text(
@@ -248,53 +261,53 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   const SizedBox(height: 16),
-                                  _buildDropdown(
-                                      'Country:',
-                                      _selectedSalutation,
-                                      _salutation, (String? newValue) {
+                                  _buildDropdown('Country:', _selectedCountry,
+                                      _countryList, (String? newValue) {
                                     setState(() {
-                                      _selectedSalutation = newValue;
+                                      _selectedCountry = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('State:', _selectedValue,
-                                      _selected, (String? newValue) {
+                                  _buildDropdown(
+                                      'State:', _selectedState, _states,
+                                      (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedState = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
                                   _buildDropdown(
                                       'District:',
-                                      _selectedValue,
-                                      _selected, (String? newValue) {
+                                      _selectedDistricts,
+                                      _districts, (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedDistricts = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Block:', _selectedValue,
-                                      _selected, (String? newValue) {
+                                  _buildDropdown(
+                                      'Block:', _selectedBlocks, _blocks,
+                                      (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedBlocks = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('VCDC :', _selectedValue,
-                                      _selected, (String? newValue) {
+                                  _buildDropdown(
+                                      'VCDC :', _selectedVcdcs, _vcdcs,
+                                      (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedVcdcs = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
                                   _buildDropdown(
                                       'Revenue Village:',
-                                      _selectedValue,
-                                      _selected, (String? newValue) {
+                                      _selectedRevenueVillages,
+                                      _revenueVillages, (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedRevenueVillages = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
@@ -328,9 +341,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     },
                                   ),
                                 ]))),
-
-
-
                     const SizedBox(height: 36),
                     const Text(
                       'Social Information',
@@ -350,53 +360,57 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-
                                   const SizedBox(height: 16),
                                   _buildDropdown(
                                       'Farmer Category:',
-                                      _selectedSalutation,
-                                      _salutation, (String? newValue) {
+                                      _selectedFarmerCategories,
+                                      _farmerCategories, (String? newValue) {
                                     setState(() {
-                                      _selectedSalutation = newValue;
+                                      _selectedFarmerCategories = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Social Category:', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
+                                  _buildDropdown(
+                                      'Social Category:',
+                                      _selectedSocialCategories,
+                                      _socialCategories, (String? newValue) {
+                                    setState(() {
+                                      _selectedSocialCategories = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
                                   _buildDropdown(
                                       'Education:',
-                                      _selectedValue,
-                                      _selected, (String? newValue) {
+                                      _selectedEducation,
+                                      _education, (String? newValue) {
                                     setState(() {
-                                      _selectedValue = newValue;
+                                      _selectedEducation = newValue;
                                     });
                                   }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Religion:', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
+                                  _buildDropdown(
+                                      'Religion:',
+                                      _selectedReligions,
+                                      _religions, (String? newValue) {
+                                    setState(() {
+                                      _selectedReligions = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Occupation :', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
-
+                                  _buildDropdown(
+                                      'Occupation :',
+                                      _selectedOccupations,
+                                      _occupations, (String? newValue) {
+                                    setState(() {
+                                      _selectedOccupations = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
                                   _buildTextField(
                                     'Aadhaar Number (Max size:12):',
                                     'Enter  Aadhaar Number',
                                     '',
-                                        (value) {
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
                                     },
@@ -406,23 +420,32 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     'Pan card Number (Max size:10):',
                                     'Enter Pan card Number (Max size:10):',
                                     '',
-                                        (value) {
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
                                     },
                                   ),
                                   const SizedBox(height: 16),
-                                  _buildTextField('Ration Card Number (Max Size:15):', 'Enter Ration Number', '', (value) {
+                                  _buildTextField(
+                                    'Ration Card Number (Max Size:15):',
+                                    'Enter Ration Number',
+                                    '',
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
-                                    },),
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
-                                  _buildTextField('Voter Number (Max Size:10):', 'Enter Voter Number', '', (value) {
+                                  _buildTextField(
+                                    'Voter Number (Max Size:10):',
+                                    'Enter Voter Number',
+                                    '',
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
-                                    },),
+                                    },
+                                  ),
                                 ]))),
-
                     const SizedBox(height: 36),
                     const Text(
                       'Family Details',
@@ -443,30 +466,49 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 16),
-                                  _buildTextField('Male Members :', 'Enter no. of Male Member', '', (value) {
-                                    // Handle the changed text
-                                    print('Email changed: $value');
-                                  },),
+                                  _buildTextField(
+                                    'Male Members :',
+                                    'Enter no. of Male Member',
+                                    '',
+                                    (value) {
+                                      // Handle the changed text
+                                      print('Email changed: $value');
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
-                                  _buildTextField('Female Members :', 'Enter no.of Female', '', (value) {
-                                    // Handle the changed text
-                                    print('Email changed: $value');
-                                  },),
+                                  _buildTextField(
+                                    'Female Members :',
+                                    'Enter no.of Female',
+                                    '',
+                                    (value) {
+                                      // Handle the changed text
+                                      print('Email changed: $value');
+                                    },
+                                  ),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Do Farmer belong to BPL Category?:', _selectedSalutation, _salutation, (String? newValue) {setState(() {_selectedSalutation = newValue;});}),
+                                  _buildDropdown(
+                                      'Do Farmer belong to BPL Category?:',
+                                      _selectedBplStatuses,
+                                      _bplStatuses, (String? newValue) {
+                                    setState(() {
+                                      _selectedBplStatuses = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
-                                  _buildDropdown('Is PM-Kishan Holder ?:', _selectedValue,
-                                      _selected, (String? newValue) {
-                                        setState(() {
-                                          _selectedValue = newValue;
-                                        });
-                                      }),
+                                  _buildDropdown(
+                                      'Is PM-Kishan Holder ?:',
+                                      _selectedPmKishans,
+                                      _pmKishans, (String? newValue) {
+                                    setState(() {
+                                      _selectedPmKishans = newValue;
+                                    });
+                                  }),
                                   const SizedBox(height: 16),
                                   _buildTextField(
                                     'PM-Kishan Number:',
                                     'Enter PM-Kishan Number',
                                     '',
-                                        (value) {
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
                                     },
@@ -476,14 +518,12 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     'No of Children (Below 12 years):',
                                     'Enter no of children',
                                     '',
-                                        (value) {
+                                    (value) {
                                       // Handle the changed text
                                       print('Email changed: $value');
                                     },
                                   ),
-
                                 ])))
-
                   ])),
         ));
   }
@@ -528,12 +568,13 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       ],
     );
   }
+
   Widget _buildTextField(
-      String label,
-      String hint,
-      String? initialValue,
-      ValueChanged<String?> onChanged,
-      ) {
+    String label,
+    String hint,
+    String? initialValue,
+    ValueChanged<String?> onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -565,5 +606,4 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       ],
     );
   }
-
 }

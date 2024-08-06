@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../model/LoginResponse.dart';
 import '../retrofit/CommonService.dart';
 import 'forgot_password_screen.dart';
@@ -47,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.status!) {
         // Handle successful login
+        print('token'+response.token.toString());
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', response.token ?? '');
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()),);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Success')));
 
