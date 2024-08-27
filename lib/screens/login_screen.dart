@@ -87,14 +87,15 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               _buildTextField(
-                'Mobile Number :',
-                'Enter Mobile Number',
+                'Email :',
+                'Enter email address',
                 _mobileNumberController,
                     (value) {
                   setState(() {
                     _mobileNumber = value ?? '';
                   });
                 },
+                isPhone: true
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -166,8 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
       String label,
       String hint,
       TextEditingController controller,
-      ValueChanged<String?> onChanged,
-      ) {
+      ValueChanged<String?> onChanged, {
+        bool isPhone = false, // Add an optional parameter for phone input
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -194,12 +196,14 @@ class _LoginScreenState extends State<LoginScreen> {
               border: InputBorder.none,
               hintText: hint,
             ),
+            keyboardType: isPhone ? TextInputType.emailAddress : TextInputType.text, // Use phone keyboard if isPhone is true
             onChanged: onChanged,
           ),
         ),
       ],
     );
   }
+
 
   Widget _buildDropdown(
       String label,

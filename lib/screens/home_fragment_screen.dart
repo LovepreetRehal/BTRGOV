@@ -216,16 +216,20 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen>  {
   // }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildLegendItem(Colors.blue, 'Agriculture'),
-        _buildLegendItem(Colors.green, 'Forest Land'),
-        _buildLegendItem(Colors.orange, 'Waste Land'),
-        _buildLegendItem(Colors.red, 'PGR/VGR'),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal, // Allows horizontal scrolling
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildLegendItem(Colors.blue, 'Agriculture'),
+          _buildLegendItem(Colors.green, 'Forest Land'),
+          _buildLegendItem(Colors.orange, 'Waste Land'),
+          _buildLegendItem(Colors.red, 'PGR/VGR'),
+        ],
+      ),
     );
   }
+
 
   Widget _buildLegendItem(Color color, String text) {
     return Row(

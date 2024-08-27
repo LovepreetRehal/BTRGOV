@@ -19,7 +19,7 @@ class CommonService {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'mobile_number': mobileNumber,
+        'email': mobileNumber,
         'password': password,
         'department_code': department,
       }),
