@@ -39,13 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final commonService = Provider.of<CommonService>(context, listen: false);
-      final LoginResponse response = await commonService.login(
-        "superadministrator@btragri.co.in",
+      final LoginResponse response = (await commonService.login(
+        _mobileNumber,
         _password,
         "D001",
         // _selectedDepartments ?? '',
-      );
-      print("login_response success: ${response.toString()}");
+      )) as LoginResponse;
+      print("login_response pass Data: $_mobileNumber,   $_password  , ");
+
 
       if (response.status!) {
         // Handle successful login

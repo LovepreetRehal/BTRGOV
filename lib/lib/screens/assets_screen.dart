@@ -15,11 +15,15 @@ class AssetsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 36),
-                    Card(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                    Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
                         elevation: 4,
                         child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 16),
                                   const Center(

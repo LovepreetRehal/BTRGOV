@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:btr_gov/data/ApiClient.dart';
-import 'package:btr_gov/retrofit/utils.dart';
+import 'package:btr_gov/lib/data/ApiClient.dart';
+import 'package:btr_gov/lib/retrofit/CommonService.dart';
+import 'package:btr_gov/lib/retrofit/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/FarmerSingleDetail.dart';
-import '../retrofit/CommonService.dart';
-import 'forgot_password_screen.dart';
-import 'home_screen.dart';
+
 import 'package:image_picker/image_picker.dart';
 
 class AddFarmerScreen extends StatefulWidget {
@@ -33,44 +31,13 @@ class _AddFarmerState extends State<AddFarmerScreen> {
   String? _selectedReligions = 'Hindu'; // Set initial value to match the list
   String? _selectedSocialCategories =
       'ST'; // Set initial value to match the list
-  String? _selectedState = ''; // Set initial value to match the list
-  String? _selectedDistricts = 'Baksa'; // Set initial value to match the list
+  String? _selectedState = 'Punjab'; // Set initial value to match the list
+  String? _selectedDistricts = 'Patiala'; // Set initial value to match the list
   String? _selectedBlocks = 'All'; // Set initial value to match the list
   String? _selectedIncome = 'Below 2000'; // Set initial value to match the list
   String? _selectedVcdcs = 'All'; // Set initial value to m
   String? _selectedRevenueVillages = 'All';
-  String? _selectedDate = ''; // State variable for storing the selected date
-  String? _familyName = 'test'; // State variable for storing the selected date
-  String? _mobileNumber = ''; // State variable for storing the selected date
-  String? _alternateMobileNumber = ''; // State variable for storing the selected date
-  String? _emailAddress = ''; // State variable for storing the selected date
-  String? _hornetNumber = '';
-  String? _monthlyIncome='2000';
-  String? _VillageName='';
-  String? _addressLine='';
-  String? _pincode='147021';
-  String? _aadharNumber='';
-  String? _panCardNumber='';
-  String? _rationCardNumber='';
-  String? _voterNumber='';
-  String? _maleMember='';
-  String? _accountNumber='';
-  String? _accountHolderName='';
-  String? _IFSCcode='';
-  String? _BankName='';
-  String? _BranchName='';
-  String? _feMaleMember='';
-  String? _pmKishansNumber='';
-  String? _noOfChildNumber='';
-  String? _firstName='demo';
-  String? _lastName='estte';
-  String? _middleName='test';
-
-  var paramdic = {"": ""};
-
-  Farmersingledetail? _Farmersingledetail;
-  bool loadlist = true;
-
+  String _selectedDate = ''; // State variable for storing the selected date
 
   bool _isLoading = false;
   final TextEditingController _dateController =
@@ -80,20 +47,44 @@ class _AddFarmerState extends State<AddFarmerScreen> {
   final List<String> _selected = ['--select--', 'MALE', 'FEMALE', 'OTHER'];
 
   final List<String> _countryList = ['India'];
-  final List<String> _farmerCategories = ['Farmer','Farm worker','Processor','Non-farmer'];
-  final List<String> _education = ['Primary(1-5 class)','Upper Primary(6-8 class)','High School(9-10 class)','Higher Secondary(11-12 class)','Graduate','Post Graduation'];
+  final List<String> _farmerCategories = ['FARMER_CAT_1'];
+  final List<String> _education = ['EDU_A'];
   final List<String> _bplStatuses = ['Yes', 'No'];
   final List<String> _pmKishans = ['Yes', 'No'];
   final List<String> _occupations = ['OCCUPATION_A'];
-  final List<String> _religions = ['Hindu', 'Christian', 'Muslim', 'Sikh', 'Buddhist', 'Jain', 'Other Religion',];
-  final List<String> _socialCategories = ['ST', 'SC', 'OBC', 'GEN',];
-  final List<String> _states = ['Assam'];
-  final List<String> _districts = ['Baksa','Balaji','Barpeta','Chirang','Kokrajhar','Tamulpur','Udalguri'];
-  final List<String> _blocks = ['BARAMA','BAKSA','DHAMDHAMA','GOBARDHANA(BTC)','GORESWAR','JALAH(BTC)','NAGRIJULI', 'TAMULPUR'];
-  final List<String> _incomes = ['Below 2000', '2000 to 5000', '5000 to 8000', '8000 to 10,000', 'Above 10, 000',];
+  final List<String> _religions = [
+    'Hindu',
+    'Christian',
+    'Muslim',
+    'Sikh',
+    'Buddhist',
+    'Jain',
+    'Other Religion',
+  ];
+  final List<String> _socialCategories = [
+    'ST',
+    'SC',
+    'OBC',
+    'GEN',
+  ];
+  final List<String> _states = ['Punjab'];
+  final List<String> _districts = ['Patiala'];
+  final List<String> _blocks = ['All', 'BLOCKA'];
+  final List<String> _incomes = [
+    'Below 2000',
+    '2000 to 5000',
+    '5000 to 8000',
+    '8000 to 10,000',
+    'Above 10, 000',
+  ];
   final List<String> _salutation = ['Mr', 'Mrs', 'Late', 'Miss', 'Smt'];
-  final List<String> _vcdcs = ['Barama', 'Debachara', 'Kaklabari', 'Kharuajan','Merkuchi','Puransripur'];
-  final List<String> _revenueVillages = ['Barama', 'Nizjuluki', 'Khadamtola', 'Heramjar''Madhapur''Kaljar''Alagar''Mahoria'];
+  final List<String> _vcdcs = ['All', 'VCDC1', 'VCDC 2', 'VCDC 3'];
+  final List<String> _revenueVillages = [
+    'All',
+    'Village 1',
+    'Village 2',
+    'Village 3'
+  ];
 
   File? _passbookImage;
   File? _aadharImage;
@@ -106,69 +97,66 @@ class _AddFarmerState extends State<AddFarmerScreen> {
         _aadharImage == null ||
         _voterIdImage == null) {
       print('Please select both files');
-      Utils.toast('Please select both files');
       return;
     }
     var param = {
-      "family_name": _familyName.toString(),
-      "monthly_income": _monthlyIncome.toString(),
-      "first_name": _firstName.toString(),
-      "middle_name": _middleName.toString(),
-      "last_name": _lastName.toString(),
-      "address_line_1": _addressLine.toString(),
-      "address_line_2": _revenueVillages.toString(),
-      "pincode": _pincode.toString(),
+      "family_name": "fxgdfgdg",
+      "monthly_income": "1",
+      "first_name": "Swsadadaran",
+      "middle_name": "cdf",
+      "last_name": "Singh",
+      "address_line_1": "etdhdhdhd",
+      "address_line_2": "Patiala",
+      "pincode": "147001",
       "country_code": "IN",
-      "state_code": _selectedState.toString(),
-      "district_code": _selectedDistricts.toString(),
-      "block_code": _selectedBlocks.toString(),
-      "vcdc_code": _selectedVcdcs.toString(),
-      "revenue_village_code": _revenueVillages.toString(),
-      "date_of_birth": _dateController.toString(),
-      "gender_code": _selectedValue.toString(),
+      "state_code": "18",
+      "district_code": "25",
+      "block_code": "15",
+      "vcdc_code": "316",
+      "revenue_village_code": "",
+      "date_of_birth": "1990-09-09",
+      "gender_code": "GEN001",
       "photograph": "",
-      "mobile_number": _mobileNumber.toString(),
-      "alternate_number": _alternateMobileNumber.toString(),
-      "email": _emailAddress.toString(),
-      "farmer_category_code": _farmerCategories.toString(),
-      "social_category_code": _socialCategories.toString(),
-      "education_code": _selectedEducation.toString(),
-      "religion_code": _selectedReligions.toString(),
-      "occupation_code": _selectedOccupations.toString(),
-      "aadhar_number": _aadharNumber.toString(),
-      "aadhar_card_image": _aadharImage.toString(),
-      "voter_card_image": _voterIdImage.toString(),
-      "relation": _selectedReligions.toString(),
-      "pan_number": _panCardNumber.toString(),
-      "ration_card": _rationCardNumber.toString(),
-      "voter_number": _voterNumber.toString(),
+      "mobile_number": "9876543210",
+      "alternate_number": "",
+      "email": "myemail@gmail.com",
+      "farmer_category_code": "CAT001",
+      "social_category_code": "SC001",
+      "education_code": "EDU001",
+      "religion_code": "4",
+      "occupation_code": "OCC001",
+      "aadhar_number": "123412565845",
+      "aadhar_card_image": "",
+      "voter_card_image": "",
+      "relation": "",
+      "pan_number": "1256987425",
+      "ration_card": "121212121212145",
+      "voter_number": "5625365842",
       "govt_farmer_id": "",
       "hortnet_id": "1111111111",
       "is_head": "",
-      "village": _selectedRevenueVillages.toString(),
+      "village": "",
       "family_head_id": "",
       "salutation_id": "1",
       "search": "",
       "is_bpl": "0",
-      "male_members": _maleMember.toString(),
-      "female_members": _feMaleMember.toString(),
-      "is_pm_kishan_holder": _pmKishans.toString(),
-      "pm_kishan_number": _pmKishansNumber.toString(),
+      "male_members": "2",
+      "female_members": "3",
+      "is_pm_kishan_holder": "0",
+      "pm_kishan_number": "",
       "is_financial_assistant_holder": "",
       "amount": "100",
       "received_year": "2000",
       "scheme_name": "",
       "open_pm_number": "0",
-      "acc_num": _accountNumber.toString(),
-      "acc_holder_name": _accountHolderName.toString(),
-      "ifsc_code": _IFSCcode.toString(),
-      "bank_name": _BankName.toString(),
-      "bank_branch_name": _BranchName.toString(),
+      "acc_num": "",
+      "acc_holder_name": "",
+      "ifsc_code": "",
+      "bank_name": "",
+      "bank_branch_name": "",
       "bank_passbook": "",
       "metadata[isGovtjob]": "0"
     };
-
-    print('rehal->>>>   $param');
     ApiClient().postMultipartData(Utils.store, param, [
       MultipartBody(
         'photograph',
@@ -184,11 +172,8 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       ),
     ]).then((onValue) {
       if (onValue.statusCode == 201) {
-        Utils.toast(onValue.body);
         print("Done ${onValue.body}");
-
       } else {
-        Utils.toast(onValue.body);
         print("error ${onValue.body}");
       }
     });
@@ -259,28 +244,32 @@ class _AddFarmerState extends State<AddFarmerScreen> {
     // }
   }
 
-  getdata(bool edit, String? id) {
-    ApiClient().getData(Utils.editDetail, true, paramdic).then((onValue) {
-      if (onValue.statusCode == 200) {
-        var data = json.decode(onValue.body);
-        _Farmersingledetail = Farmersingledetail.fromJson(data["data"]);
-        print(data["data"]);
-        loadlist = false;
+  Future<void> _getfarmerDetail() async {
+    try {
+      final commonService = Provider.of<CommonService>(context, listen: false);
+      final response = await commonService.getFarmerDetail();
+      print("forgot_response success: ${response.toString()}");
+
+      if (response.status!) {
+        // Handle successful login
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Success')));
       } else {
-        loadlist = false;
+        // Show error message if login failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed : ${response.toString()}')),
+        );
       }
-      setState(() {});
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    print('Edit mode: ${widget.edit}');
-    print('Farmer ID: ${widget.id}');
-    if(widget.edit == true){
-      getdata(widget.edit, widget.id); // Fetch farmer details when screen is opened
-
+    } catch (e) {
+      print("forgot catch: ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed : ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -288,6 +277,12 @@ class _AddFarmerState extends State<AddFarmerScreen> {
     if (widget.edit == false) {
       return;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // _getfarmerDetail(); // Fetch farmer details when screen is opened
   }
 
   @override
@@ -334,7 +329,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _firstName = value;
                                     print('FirstName changed: $value');
                                   },
                                 ),
@@ -345,7 +339,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _middleName = value;
                                     print('MiddleName changed: $value');
                                   },
                                 ),
@@ -356,7 +349,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _lastName = value;
                                     print('LastName changed: $value');
                                   },
                                 ),
@@ -366,7 +358,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   'Enter Family Name',
                                   '',
                                   (value) {
-                                    _familyName = value ?? '';
                                     print('FamilyName changed: $value');
                                   },
                                 ),
@@ -387,9 +378,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                     'Mobile Number:', 'Enter Mobile Number', '',
                                     (value) {
-                                      _mobileNumber = value ?? '';
-
-                                      print('Mobile Number changed: $value');
+                                  print('Mobile Number changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
                                 _buildTextField(
@@ -397,8 +386,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     'Enter Alternate Mobile Number ',
                                     '', (value) {
                                   // Handle the changed text
-                                  _alternateMobileNumber = value ?? '';
-
                                   print('Mobile Number changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
@@ -408,8 +395,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _emailAddress = value ?? '';
-
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -427,11 +412,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     'Enter Hornet Number',
                                     '', (value) {
                                   // Handle the changed text
-                                  setState(() {
-                                    _hornetNumber = value;
-
-                                  });
-
                                   print('Hornet Number changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
@@ -439,8 +419,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                     'Monthly Family Income ✫ :', '', '',
                                     (value) {
                                   // Handle the changed text
-                                      _monthlyIncome = value;
-
                                   print('MonthlyIncome changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
@@ -526,8 +504,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   'Enter Village Name',
                                   '',
                                   (value) {
-                                    _VillageName = value;
-
                                     // Handle the changed text
                                     print('Email changed: $value');
                                   },
@@ -539,7 +515,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _addressLine = value;
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -550,7 +525,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _pincode = value;
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -620,9 +594,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField('Aadhaar Number (Max size:12):',
                                     'Enter  Aadhaar Number', '', (value) {
                                   // Handle the changed text
-                                      _aadharNumber = value;
-
-                                  print('Aadhaar number changed: $value');
+                                  print('Email changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
                                 _buildTextField(
@@ -631,7 +603,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _panCardNumber = value;
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -642,9 +613,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _rationCardNumber = value;
-
-                                    print('Cardnumber changed: $value');
+                                    print('Email changed: $value');
                                   },
                                 ),
                                 const SizedBox(height: 16),
@@ -654,7 +623,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _voterNumber = value;
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -685,8 +653,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _maleMember = value;
-                                    print('male member changed: $value');
+                                    print('Email changed: $value');
                                   },
                                 ),
                                 const SizedBox(height: 16),
@@ -696,7 +663,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _feMaleMember = value;
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -725,8 +691,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _pmKishansNumber = value;
-
                                     print('Email changed: $value');
                                   },
                                 ),
@@ -737,143 +701,59 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   '',
                                   (value) {
                                     // Handle the changed text
-                                    _noOfChildNumber = value;
                                     print('Email changed: $value');
                                   },
                                 ),
                               ]))),
                   const SizedBox(height: 16),
-
-                  const SizedBox(height: 36),
-                  const Text(
-                    'Account Details',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        _buildImageUploadSection(
+                          title: 'Passbook Image',
+                          buttonText: 'Upload Passbook',
+                          imageFile: _passbookImage,
+                          onUpload: () =>
+                              _pickImage(ImageSource.gallery, 'passbook'),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.all(
+                                    8.0), // Add margin to provide space
+                                child: _buildImageUploadSection(
+                                  title: 'Upload Aadhaar Card',
+                                  buttonText: 'Browse Image',
+                                  imageFile: _aadharImage,
+                                  onUpload: () =>
+                                      _pickImage(ImageSource.gallery, 'aadhar'),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                                width: 8), // Add space between the containers
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.all(
+                                    8.0), // Add margin to provide space
+                                child: _buildImageUploadSection(
+                                  title: 'Upload Voter ID Card',
+                                  buttonText: 'Browse Image',
+                                  imageFile: _voterIdImage,
+                                  onUpload: () => _pickImage(
+                                      ImageSource.gallery, 'voterId'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 4,
-                      child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 16),
-                                _buildTextField(
-                                  'Account Number (Max size: 20) :',
-                                  'Enter Account Number',
-                                  '',
-                                      (value) {
-                                    // Handle the changed text
-                                    _accountNumber = value;
-                                    print('male member changed: $value');
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                _buildTextField(
-                                  'Account Holder Name :',
-                                  'Enter Account Holder Name ',
-                                  '',
-                                      (value) {
-                                    // Handle the changed text
-                                    _accountHolderName = value;
-                                    print('Email changed: $value');
-                                  },
-                                ),
-
-                                const SizedBox(height: 16),
-                                _buildTextField('IFSC Code (Max size: 11) :', 'Enter IFSC Code ', '',
-                                      (value) {
-                                    // Handle the changed text
-                                    _IFSCcode = value;
-                                    print('Email changed: $value');
-                                  },
-                                ),
-
-                                const SizedBox(height: 16),
-                                _buildTextField(
-                                  'Bank Name :',
-                                  'Bank Name ',
-                                  '',
-                                      (value) {
-                                    // Handle the changed text
-                                    _BankName = value;
-
-                                    print('Email changed: $value');
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-                                _buildTextField(
-                                  'Branch Name :',
-                                  'Branch Name',
-                                  '',
-                                      (value) {
-                                    // Handle the changed text
-                                        _BranchName = value;
-                                    print('Email changed: $value');
-                                  },
-
-
-                                ),
-                                const SizedBox(height: 16),
-                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      _buildImageUploadSection(
-                                        title: 'Passbook Image',
-                                        buttonText: 'Upload Passbook',
-                                        imageFile: _passbookImage,
-                                        onUpload: () =>
-                                            _pickImage(ImageSource.camera, 'passbook'),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              margin: const EdgeInsets.all(8.0), // Add margin to provide space
-                                              child: _buildImageUploadSection(
-                                                title: 'Upload Aadhaar Card',
-                                                buttonText: 'Browse Image',
-                                                imageFile: _aadharImage,
-                                                onUpload: () =>
-                                                    _pickImage(ImageSource.camera, 'aadhar'),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8), // Add space between the containers
-                                          Expanded(
-                                            child: Container(
-                                              margin: const EdgeInsets.all(
-                                                  8.0), // Add margin to provide space
-                                              child: _buildImageUploadSection(
-                                                title: 'Upload Voter ID Card',
-                                                buttonText: 'Browse Image',
-                                                imageFile: _voterIdImage,
-                                                onUpload: () => _pickImage(
-                                                    ImageSource.camera, 'voterId'),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ]
-                          ),
-                      ),
-
-
-                  ),
-
                   const SizedBox(height: 16),
                   _buildSectionTitle("Save")
                 ],
@@ -883,10 +763,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
 
   Widget _buildDropdown(String label, String? selectedValue, List<String> items,
       ValueChanged<String?> onChanged) {
-    // Ensure that selectedValue is either null or matches one of the items
-    String? validatedSelectedValue =
-    items.contains(selectedValue) ? selectedValue : null;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -900,6 +776,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
+          // Make the container take the full width of its parent
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -908,8 +785,9 @@ class _AddFarmerState extends State<AddFarmerScreen> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: validatedSelectedValue,
+              value: selectedValue,
               isExpanded: true,
+              // Make the dropdown take the full width of its container
               onChanged: onChanged,
               items: items.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
@@ -923,7 +801,6 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       ],
     );
   }
-
 
   Widget _buildTextField(
     String label,

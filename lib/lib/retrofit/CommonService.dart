@@ -26,11 +26,15 @@ class CommonService {
       }),
     );
 
+    print("login_response pass Data: $mobileNumber,   $password  , $department");
+
 
     if (response.statusCode == 200) {
       print("login_response success: ${response.body}");
+      print("login_response pass Data: $mobileNumber,   $password  , $department");
       return LoginResponse.fromJson(jsonDecode(response.body));
     } else {
+      print("login_response pass Data: $mobileNumber,   $password  , $department");
       print("login_response error: ${response.toString()}");
       throw Exception('Failed to log in');
     }

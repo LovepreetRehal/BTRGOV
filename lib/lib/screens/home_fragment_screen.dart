@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:btr_gov/data/ApiClient.dart';
-import 'package:btr_gov/retrofit/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:btr_gov/lib/data/ApiClient.dart';
+import 'package:btr_gov/lib/retrofit/utils.dart';
 
 class HomeFragmentScreen extends StatefulWidget {
   const HomeFragmentScreen({super.key});
@@ -19,12 +18,11 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
   String? _selectedRevenueVillage = 'All';
 
   final List<String> _districts = [
-    'All',
     'Baksa',
     'Chirang',
     'Kokrajhar',
-    'Tamulpur',
-    'Udalguri',
+    'Tamulpur'
+    'Udalguri'
   ];
   final List<String> _blocks = ['All', 'Block 1', 'Block 2', 'Block 3'];
   final List<String> _vcdcs = ['All', 'VCDC 1', 'VCDC 2', 'VCDC 3'];
@@ -36,48 +34,26 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
   ];
   bool isdata = true;
   Map<String, dynamic>? Dashboarddata;
-  Map<String, dynamic>? DashboardCategory;
 
   @override
   void initState() {
     getdata();
-    fetchCategoryWiseFarmerStats();
     super.initState();
   }
 
   getdata() {
     ApiClient().getData(Utils.stats, true, "").then((onValue) {
       if (onValue.statusCode == 200) {
-        setState(() {
-          isdata = false;
-          Dashboarddata = json.decode(onValue.body) as Map<String, dynamic>;
-          print(Dashboarddata?["landType"]);
-        });
+        isdata = false;
+        var data = json.decode(onValue.body);
+        Dashboarddata = data as Map<String, dynamic>;
+        print(Dashboarddata!["landType"]);
       } else {
-        setState(() {
-          isdata = false;
-        });
+        isdata = false;
       }
+      setState(() {});
     });
   }
-
-  void fetchCategoryWiseFarmerStats() async {
-    final Map<String, String> queryParams = {'filter': 'categoryWiseFarmerStats'};
-    ApiClient().homeCategoryFilter(Utils.dashboard, queryParams ,true, ).then((onValue) {
-
-
-    if (onValue.statusCode == 200) {
-      setState(() {
-        DashboardCategory = json.decode(onValue.body) as Map<String, dynamic>;
-      });
-      print("----- $DashboardCategory");
-    } else {
-      // Handle the error case
-      print('Error: ${onValue.body}');
-    }
-  });}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,18 +77,18 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
               ),
               SizedBox(height: 16),
               _buildDropdown('District', _selectedDistrict, _districts,
-                      (String? newValue) {
-                    setState(() {
-                      _selectedDistrict = newValue;
-                    });
-                  }),
+                  (String? newValue) {
+                setState(() {
+                  _selectedDistrict = newValue;
+                });
+              }),
               SizedBox(height: 16),
               _buildDropdown('Block', _selectedBlock, _blocks,
-                      (String? newValue) {
-                    setState(() {
-                      _selectedBlock = newValue;
-                    });
-                  }),
+                  (String? newValue) {
+                setState(() {
+                  _selectedBlock = newValue;
+                });
+              }),
               SizedBox(height: 16),
               _buildDropdown('VCDC', _selectedVCDC, _vcdcs, (String? newValue) {
                 setState(() {
@@ -122,11 +98,11 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
               SizedBox(height: 16),
               _buildDropdown(
                   'Revenue Village', _selectedRevenueVillage, _revenueVillages,
-                      (String? newValue) {
-                    setState(() {
-                      _selectedRevenueVillage = newValue;
-                    });
-                  }),
+                  (String? newValue) {
+                setState(() {
+                  _selectedRevenueVillage = newValue;
+                });
+              }),
               SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -138,8 +114,8 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.indigo[400],
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 8.0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6.0),
                       ),
@@ -181,10 +157,8 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                Dashboarddata?['farmersInfo']
-                                ?['farmers_count']
-                                    ?.toString() ??
-                                    '0',
+                                Dashboarddata!["farmersInfo"]["farmers_count"]
+                                    .toString(),
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
@@ -204,7 +178,7 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
                             radius: 24,
                             backgroundColor: Color(0xFF28a745),
                             child: Text(
-                              "", // Placeholder for future content
+                              "",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
@@ -219,52 +193,55 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
               ),
               SizedBox(height: 16),
               _buildSectionTitle('FARMERS CATEGORY'),
-              // SizedBox(height: 8),
-              // SingleChildScrollView(
-              //   scrollDirection: Axis.horizontal,
-              //   child: _buildDataTable(
-              //     DashboardCategory?["categoryWiseFarmerStats"] != null
-              //         ? List.generate(DashboardCategory!["categoryWiseFarmerStats"].length,
-              //             (int index) {
-              //           return _buildDataRow(
-              //             DashboardCategory!["categoryWiseFarmerStats"][index]["name"] ??
-              //                 'Unknown',
-              //             DashboardCategory!["categoryWiseFarmerStats"][index]["count"]
-              //                 ?.toString() ??
-              //                 '0',
-              //           );
-              //         })
-              //         : [],
-              //   ),
-              // ),
-
               SizedBox(height: 8),
-              _buildDataTable([
-                _buildDataRow('Farmer', '28428'),
-                _buildDataRow('Farm worker', '35'),
-                _buildDataRow('Processor', '8'),
-                _buildDataRow('Non-farmer', '278'),
-              ]),
+              _buildDataTable(
+                  //     List.generate(Dashboarddata!["landType"].length, (int index) {
+                  //   return _buildDataRow(Dashboarddata!["landType"][index]["name"],
+                  //       Dashboarddata!["landType"][index]["count"].toString());
+                  // })
+                  [
+                    _buildDataRow('Farmer', '28428'),
+                    _buildDataRow('Farm worker', '35'),
+                    _buildDataRow('Processor', '8'),
+                    _buildDataRow('Non-farmer', '278'),
+                  ]),
               SizedBox(height: 16),
               _buildSectionTitle('LAND TYPES'),
               SizedBox(height: 8),
               SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: _buildDataTable(
-                  Dashboarddata?["landType"] != null
-                      ? List.generate(Dashboarddata!["landType"].length,
-                          (int index) {
-                        return _buildDataRow(
-                          Dashboarddata!["landType"][index]["name"] ??
-                              'Unknown',
+                  scrollDirection: Axis.horizontal,
+                  child: _buildDataTable(
+                    List.generate(Dashboarddata!["landType"].length,
+                        (int index) {
+                      return _buildDataRow(
+                          Dashboarddata!["landType"][index]["name"],
                           Dashboarddata!["landType"][index]["count"]
-                              ?.toString() ??
-                              '0',
-                        );
-                      })
-                      : [],
-                ),
-              ),
+                              .toString());
+                    }),
+                  )
+                  // child: _buildDataTable([
+                  //   _buildDataRowWithUnits(
+                  //       'Agriculture', '25964', '109362.26', '14217.09'),
+                  //   _buildDataRowWithUnits('Waste Land', '90', '325.5', '42.32'),
+                  //   _buildDataRowWithUnits('PGR/VGR', '222', '816', '106.08'),
+                  //   _buildDataRowWithUnits('Forest', '1378', '7672.52', '997.43'),
+                  // ]),
+                  ),
+              SizedBox(height: 16),
+              // Expanded(
+              // child: PieChart(
+              //   PieChartData(
+              //     sections: _buildPieChartSections(),
+              //     sectionsSpace: 0,
+              //     centerSpaceRadius: 40,
+              //     pieTouchData: PieTouchData(
+              //       touchCallback: (FlTouchEvent event, pieTouchResponse) {
+              //         // Handle touch response here
+              //       },
+              //     ),
+              //   ),
+              // ),
+              // ),
               SizedBox(height: 16),
               _buildLegend(),
             ],
@@ -273,6 +250,45 @@ class _HomeFragmentScreenState extends State<HomeFragmentScreen> {
       ),
     );
   }
+
+  // List<PieChartSectionData> _buildPieChartSections() {
+  //   return [
+  //     PieChartSectionData(
+  //       color: Colors.blue,
+  //       value: 94,
+  //       title: '94.0%',
+  //       radius: 50,
+  //       titleStyle: TextStyle(
+  //         fontSize: 16,
+  //         fontWeight: FontWeight.bold,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //     PieChartSectionData(
+  //       color: Colors.green,
+  //       value: 5,
+  //       title: '5.0%',
+  //       radius: 50,
+  //       titleStyle: TextStyle(
+  //         fontSize: 16,
+  //         fontWeight: FontWeight.bold,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //     PieChartSectionData(
+  //       color: Colors.orange,
+  //       value: 1,
+  //       title: '',
+  //       radius: 50,
+  //     ),
+  //     PieChartSectionData(
+  //       color: Colors.red,
+  //       value: 0.5,
+  //       title: '',
+  //       radius: 50,
+  //     ),
+  //   ];
+  // }
 
   Widget _buildLegend() {
     return SingleChildScrollView(
@@ -323,12 +339,13 @@ Widget _buildDropdown(String label, String? selectedValue, List<String> items,
         padding: EdgeInsets.symmetric(horizontal: 12.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(4.0),
           border: Border.all(color: Colors.grey),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: selectedValue,
+            isExpanded: true,
             onChanged: onChanged,
             items: items.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -337,6 +354,60 @@ Widget _buildDropdown(String label, String? selectedValue, List<String> items,
               );
             }).toList(),
           ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildDataTable(List<DataRow> rows) {
+  return DataTable(
+    columns: [
+      DataColumn(
+        label: Text(
+          'Farmer Category',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      DataColumn(
+        label: Text(
+          'Total Registered',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    ],
+    rows: rows,
+  );
+}
+
+DataRow _buildDataRow(String category, String total) {
+  return DataRow(
+    cells: [
+      DataCell(Text(category)),
+      DataCell(Text(total)),
+    ],
+  );
+}
+
+DataRow _buildDataRowWithUnits(
+    String category, String totalFarmers, String bighas, String hectares) {
+  return DataRow(
+    cells: [
+      DataCell(Text(category)),
+      DataCell(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Total Farmers: $totalFarmers'),
+            Text('Bighas: $bighas'),
+            // Text('Hectares: $hectares'),
+          ],
         ),
       ),
     ],
@@ -374,38 +445,3 @@ Widget _buildSectionTitle(String title) {
     ),
   );
 }
-
-
-Widget _buildDataTable(List<DataRow> rows) {
-  return DataTable(
-    columns: const [
-      DataColumn(
-        label: Text(
-          'Category',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      DataColumn(
-        label: Text(
-          'Count',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ],
-    rows: rows,
-  );
-}
-
-DataRow _buildDataRow(String category, String count) {
-  return DataRow(
-    cells: [
-      DataCell(Text(category)),
-      DataCell(Text(count)),
-    ],
-  );
-}
-

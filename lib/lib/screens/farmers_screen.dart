@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-import 'package:btr_gov/data/ApiClient.dart';
-import 'package:btr_gov/model/Farmarlist.dart';
-import 'package:btr_gov/retrofit/utils.dart';
-import 'package:btr_gov/screens/add_farmer_screen.dart';
+
+import 'package:btr_gov/lib/data/ApiClient.dart';
+import 'package:btr_gov/lib/model/Farmarlist.dart';
+import 'package:btr_gov/lib/retrofit/utils.dart';
+import 'package:btr_gov/lib/screens/add_farmer_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 
 class FarmersScreen extends StatefulWidget {
   const FarmersScreen({super.key});
@@ -61,38 +63,6 @@ class _FarmerScreenState extends State<FarmersScreen> {
         loadlist = false;
       } else {
         loadlist = false;
-      }
-      setState(() {});
-    });
-  }
-
-  apiCall(id) {
-    ApiClient().deleteData(Utils.deleteDetail + id, true).then((onValue) {
-      if (onValue.statusCode == 200) {
-        var data = json.decode(onValue.body);
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Success: ${data["message"] ?? "Data deleted successfully"}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        setState(() {
-          getdata();
-
-        });
-        print(data["data"]);
-        loadlist = false;
-      } else {
-        var data = json.decode(onValue.body);
-
-        loadlist = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Success: ${data["message"] ?? "Data deleted successfully"}'),
-            backgroundColor: Colors.green,
-          ),
-        );
       }
       setState(() {});
     });
@@ -218,11 +188,11 @@ class _FarmerScreenState extends State<FarmersScreen> {
                                         },
                                         style: ElevatedButton.styleFrom(
                                           foregroundColor: Colors.white,
-                                          backgroundColor: Colors.indigo[400],
-                                          // Text color
+                                          backgroundColor:
+                                              Colors.indigo[400], // Text color
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 20.0, vertical: 8.0),
-                                          // px-5 py-2
+                                              horizontal: 20.0,
+                                              vertical: 8.0), // px-5 py-2
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 6.0), // Border radius similar to rounded-md
@@ -298,53 +268,20 @@ class _FarmerScreenState extends State<FarmersScreen> {
                                         _buildRow("Village", data["vill_1"]),
                                       ],
                                     ),
-                                    // InkWell(
-                                    //     onTap: () {
-                                    //       Navigator.of(context)
-                                    //           .push(MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             AddFarmerScreen(
-                                    //           edit: true,
-                                    //           id: data["farmer_uuid"],
-                                    //         ),
-                                    //       ));
-                                    //     },
-                                    //     child: Icon(
-                                    //       Icons.edit,
-                                    //     ))
-                                    Row(
-                                      children: [
-                                        // Edit button
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AddFarmerScreen(
-                                                  edit: true,
-                                                  id: data["farmer_uuid"],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Icon(Icons.edit),
-                                        ),
-                                        // Edit text field
-
-                                        // Delete button
-                                        IconButton(
-                                          icon: Icon(Icons.delete),
-                                          onPressed: () {
-                                            setState(() {
-                                              apiCall(
-                                                data["uuid"],
-                                              );
-                                            });
-                                            // Handle delete action here
-                                          },
-                                        ),
-                                      ],
-                                    )
+                                    InkWell(
+                                        onTap: () {
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddFarmerScreen(
+                                              edit: true,
+                                              id: data["farmer_uuid"],
+                                            ),
+                                          ));
+                                        },
+                                        child: Icon(
+                                          Icons.edit,
+                                        ))
                                   ],
                                 ),
                               );
