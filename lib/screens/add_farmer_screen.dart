@@ -6,6 +6,7 @@ import 'package:btr_gov/retrofit/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/FarmerSingleDetail.dart';
+import '../model/FarmerStateRepose.dart';
 import '../retrofit/CommonService.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
@@ -99,7 +100,45 @@ class _AddFarmerState extends State<AddFarmerScreen> {
   File? _aadharImage;
   File? _voterIdImage;
 
+  Map<String, dynamic>? DashboardCategory;
+
+
   final ImagePicker _picker = ImagePicker();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _middleNameController = TextEditingController();
+  final TextEditingController _FamilyNameController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _mobilenumberController = TextEditingController();
+  final TextEditingController _alternateNumberController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _hornetController = TextEditingController();
+  final TextEditingController _villageNameController = TextEditingController();
+  final TextEditingController _addressLineController = TextEditingController();
+  final TextEditingController _pincodeController = TextEditingController();
+  final TextEditingController _aadharCardController = TextEditingController();
+  final TextEditingController _panCardController = TextEditingController();
+  final TextEditingController _rationCardController = TextEditingController();
+  final TextEditingController _voterCardController = TextEditingController();
+  final TextEditingController _maleMemberController = TextEditingController();
+  final TextEditingController _feMaleMemberController = TextEditingController();
+  final TextEditingController _pmkishanController = TextEditingController();
+  final TextEditingController _childrenNoController = TextEditingController();
+  final TextEditingController _accountNoController = TextEditingController();
+  final TextEditingController _accountHolderNameController = TextEditingController();
+  final TextEditingController _ifscCodeController = TextEditingController();
+  final TextEditingController _bankNameController = TextEditingController();
+  final TextEditingController _branchNameController = TextEditingController();
+
+
+
+  List<District> _district = [];
+  List<CategoryWiseFarmerStats> _categoryWiseFarmerStats = [];
+  List<LandTypeWiseLandStats> _landTypeWiseLandStats = [];
+  List<Block> _block = [];
+  List<Vcdc> _vcdc = [];
+  List<Village> _villages = [];
+
 
   Future<void> _CreateFarmer() async {
     if (_passbookImage == null ||
@@ -116,14 +155,14 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       "middle_name": _middleName.toString(),
       "last_name": _lastName.toString(),
       "address_line_1": _addressLine.toString(),
-      "address_line_2": _revenueVillages.toString(),
+      "address_line_2": _selectedRevenueVillages.toString(),
       "pincode": _pincode.toString(),
       "country_code": "IN",
       "state_code": _selectedState.toString(),
       "district_code": _selectedDistricts.toString(),
       "block_code": _selectedBlocks.toString(),
       "vcdc_code": _selectedVcdcs.toString(),
-      "revenue_village_code": _revenueVillages.toString(),
+      "revenue_village_code": _selectedRevenueVillages.toString(),
       "date_of_birth": _dateController.toString(),
       "gender_code": _selectedValue.toString(),
       "photograph": "",
@@ -193,78 +232,19 @@ class _AddFarmerState extends State<AddFarmerScreen> {
       }
     });
 
-    // try {
-    //   final commonService = Provider.of<CommonService>(context, listen: false);
-
-    //   await commonService.postFarmerData(
-    //     photograph: _passbookImage!,
-    //     aadharCardImage: _aadharImage!,
-    //     familyName: 'fxgdfgdg',
-    //     monthlyIncome: '1',
-    //     firstName: 'Swsadadaran',
-    //     middleName: 'cdf',
-    //     lastName: 'Singh',
-    //     addressLine1: 'etdhdhdhd',
-    //     addressLine2: 'Patiala',
-    //     pincode: '147001',
-    //     countryCode: 'IN',
-    //     stateCode: '18',
-    //     districtCode: '25',
-    //     blockCode: '15',
-    //     vcdcCode: '316',
-    //     revenueVillageCode: '',
-    //     dateOfBirth: '1990-09-09',
-    //     genderCode: 'GEN001',
-    //     mobileNumber: '9876543210',
-    //     alternateNumber: '',
-    //     email: 'myemail@gmail.com',
-    //     farmerCategoryCode: 'CAT001',
-    //     socialCategoryCode: '04',
-    //     educationCode: 'EDU001',
-    //     religionCode: '04',
-    //     occupationCode: 'OCC001',
-    //     aadharNumber: '123412565845',
-    //     voterCardImage: '',
-    //     relation: '',
-    //     panNumber: '1256987425',
-    //     rationCard: '121212121212145',
-    //     voterNumber: '5625365842',
-    //     govtFarmerId: '',
-    //     hortnetId: '1111111111',
-    //     isHead: '',
-    //     village: '',
-    //     familyHeadId: '',
-    //     salutationId: '1',
-    //     search: '',
-    //     isBpl: '0',
-    //     maleMembers: '2',
-    //     femaleMembers: '3',
-    //     isPmKishanHolder: '0',
-    //     pmKishanNumber: '',
-    //     isFinancialAssistantHolder: '',
-    //     amount: '',
-    //     receivedYear: '',
-    //     schemeName: '',
-    //     openPmNumber: '0',
-    //     accNum: '',
-    //     accHolderName: '',
-    //     ifscCode: '',
-    //     bankName: '',
-    //     bankBranchName: '',
-    //     bankPassbook: '',
-    //     metadataIsGovtjob: '0',
-    //   );
-    // } catch (e) {
-    //   print('Error: $e');
-    // }
   }
 
-  getdata(bool edit, String? id) {
+  getEditData(bool edit, String? id) {
     ApiClient().getData(Utils.editDetail, true, paramdic).then((onValue) {
       if (onValue.statusCode == 200) {
         var data = json.decode(onValue.body);
         _Farmersingledetail = Farmersingledetail.fromJson(data["data"]);
         print(data["data"]);
+        setState(() {
+          _firstNameController.text = data['full_name'];
+          _dobController.text = data['date_of_birth'];
+          _mobilenumberController.text = data['mobile_number'];
+        });
         loadlist = false;
       } else {
         loadlist = false;
@@ -273,13 +253,49 @@ class _AddFarmerState extends State<AddFarmerScreen> {
     });
   }
 
+
+
+  void fetchCategoryWiseFarmerStats() async {
+    final Map<String, String> queryParams = {'': ''};
+    ApiClient().homeCategoryFilter(Utils.dashboard, queryParams ,true, ).then((onValue) {
+
+
+      if (onValue.statusCode == 200) {
+        setState(() {
+
+          // DashboardCategory = json.decode(onValue.body) as Map<String, dynamic>;
+
+          final responseData = jsonDecode(onValue.body);
+          final farmerStatsResponse = FarmerStatsResponse.fromJson(responseData);
+          _categoryWiseFarmerStats = farmerStatsResponse.data.categoryWiseFarmerStats;
+          _landTypeWiseLandStats = farmerStatsResponse.data.landTypeWiseLandStats;
+          _district = farmerStatsResponse.data.districts;
+          _block = farmerStatsResponse.data.blocks;
+          _vcdc = farmerStatsResponse.data.vcdcs;
+          _villages = farmerStatsResponse.data.villages;
+          print("_categoryWiseFarmerStats  API RESPOSE----- ${_categoryWiseFarmerStats}");
+          print("_villages  API RESPOSE----- ${_villages}");
+
+        });
+        print("fetchCategoryWiseFarmerStats  API RESPOSE----- ${json.decode(onValue.body)}");
+      } else {
+        // Handle the error case
+        print('Error: ${onValue.body}');
+      }
+    });}
+
+
+
+
   @override
   void initState() {
     super.initState();
     print('Edit mode: ${widget.edit}');
     print('Farmer ID: ${widget.id}');
+    fetchCategoryWiseFarmerStats();
+
     if(widget.edit == true){
-      getdata(widget.edit, widget.id); // Fetch farmer details when screen is opened
+      getEditData(widget.edit, widget.id); // Fetch farmer details when screen is opened
 
     }
   }
@@ -331,7 +347,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'First Name:',
                                   'Enter First Name',
-                                  '',
+                                  _firstNameController,
                                   (value) {
                                     // Handle the changed text
                                     _firstName = value;
@@ -342,7 +358,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Middle Name:',
                                   'Enter Middle Name',
-                                  '',
+                                  _middleNameController,
                                   (value) {
                                     // Handle the changed text
                                     _middleName = value;
@@ -353,7 +369,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Last Name:',
                                   'Enter Last Name',
-                                  '',
+                                  _lastNameController,
                                   (value) {
                                     // Handle the changed text
                                     _lastName = value;
@@ -364,7 +380,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Family Name:',
                                   'Enter Family Name',
-                                  '',
+                                  _FamilyNameController,
                                   (value) {
                                     _familyName = value ?? '';
                                     print('FamilyName changed: $value');
@@ -374,18 +390,19 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildDatePickerField(
                                   'Date of Birth:',
                                   'Enter DOB',
-                                  _dateController,
+                                _dobController,
                                   // Pass the date controller to the date field
                                   (value) {
-                                    setState(() {
+                                    // setState(() {
                                       _selectedDate = value ?? '';
                                       print('Selected DOB: $value');
-                                    });
+                                    // }
+                                    // );
                                   },
                                 ),
                                 const SizedBox(height: 16),
                                 _buildTextField(
-                                    'Mobile Number:', 'Enter Mobile Number', '',
+                                    'Mobile Number:', 'Enter Mobile Number', _mobilenumberController,
                                     (value) {
                                       _mobileNumber = value ?? '';
 
@@ -395,7 +412,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                     'Alternate Mobile Number :',
                                     'Enter Alternate Mobile Number ',
-                                    '', (value) {
+                                    _alternateNumberController, (value) {
                                   // Handle the changed text
                                   _alternateMobileNumber = value ?? '';
 
@@ -405,7 +422,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Email:',
                                   'Enter Email Address',
-                                  '',
+                                  _emailController,
                                   (value) {
                                     // Handle the changed text
                                     _emailAddress = value ?? '';
@@ -425,7 +442,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                     'Hornet Number (Max size: 10) :',
                                     'Enter Hornet Number',
-                                    '', (value) {
+                                    _hornetController, (value) {
                                   // Handle the changed text
                                   setState(() {
                                     _hornetNumber = value;
@@ -435,17 +452,8 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                   print('Hornet Number changed: $value');
                                 }, isPhone: true),
                                 const SizedBox(height: 16),
-                                _buildTextField(
-                                    'Monthly Family Income ✫ :', '', '',
-                                    (value) {
-                                  // Handle the changed text
-                                      _monthlyIncome = value;
-
-                                  print('MonthlyIncome changed: $value');
-                                }, isPhone: true),
-                                const SizedBox(height: 16),
                                 _buildDropdown(
-                                    'Monthly Family IncomeZ:',
+                                    'Monthly Family Income ✫ :',
                                     _selectedIncome,
                                     _incomes, (String? newValue) {
                                   setState(() {
@@ -524,7 +532,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Village Name:',
                                   'Enter Village Name',
-                                  '',
+                                  _villageNameController,
                                   (value) {
                                     _VillageName = value;
 
@@ -536,7 +544,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Address Line:',
                                   'Enter Address Line',
-                                  '',
+                                  _addressLineController,
                                   (value) {
                                     // Handle the changed text
                                     _addressLine = value;
@@ -547,7 +555,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Pincode::',
                                   'Enter PinCode',
-                                  '',
+                                  _pincodeController,
                                   (value) {
                                     // Handle the changed text
                                     _pincode = value;
@@ -618,7 +626,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 }),
                                 const SizedBox(height: 16),
                                 _buildTextField('Aadhaar Number (Max size:12):',
-                                    'Enter  Aadhaar Number', '', (value) {
+                                    'Enter  Aadhaar Number', _aadharCardController, (value) {
                                   // Handle the changed text
                                       _aadharNumber = value;
 
@@ -628,7 +636,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Pan card Number (Max size:10):',
                                   'Enter Pan card Number (Max size:10):',
-                                  '',
+                                  _panCardController,
                                   (value) {
                                     // Handle the changed text
                                     _panCardNumber = value;
@@ -639,7 +647,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Ration Card Number (Max Size:15):',
                                   'Enter Ration Number',
-                                  '',
+                                  _rationCardController,
                                   (value) {
                                     // Handle the changed text
                                     _rationCardNumber = value;
@@ -651,7 +659,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Voter Number (Max Size:10):',
                                   'Enter Voter Number',
-                                  '',
+                                  _voterCardController,
                                   (value) {
                                     // Handle the changed text
                                     _voterNumber = value;
@@ -682,7 +690,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Male Members :',
                                   'Enter no. of Male Member',
-                                  '',
+                                  _maleMemberController,
                                   (value) {
                                     // Handle the changed text
                                     _maleMember = value;
@@ -693,7 +701,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Female Members :',
                                   'Enter no.of Female',
-                                  '',
+                                  _feMaleMemberController,
                                   (value) {
                                     // Handle the changed text
                                     _feMaleMember = value;
@@ -722,7 +730,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'PM-Kishan Number:',
                                   'Enter PM-Kishan Number',
-                                  '',
+                                  _pmkishanController,
                                   (value) {
                                     // Handle the changed text
                                     _pmKishansNumber = value;
@@ -734,7 +742,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'No of Children (Below 12 years):',
                                   'Enter no of children',
-                                  '',
+                                  _childrenNoController,
                                   (value) {
                                     // Handle the changed text
                                     _noOfChildNumber = value;
@@ -767,7 +775,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Account Number (Max size: 20) :',
                                   'Enter Account Number',
-                                  '',
+                                  _accountNoController,
                                       (value) {
                                     // Handle the changed text
                                     _accountNumber = value;
@@ -778,7 +786,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Account Holder Name :',
                                   'Enter Account Holder Name ',
-                                  '',
+                                  _accountHolderNameController,
                                       (value) {
                                     // Handle the changed text
                                     _accountHolderName = value;
@@ -787,7 +795,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 ),
 
                                 const SizedBox(height: 16),
-                                _buildTextField('IFSC Code (Max size: 11) :', 'Enter IFSC Code ', '',
+                                _buildTextField('IFSC Code (Max size: 11) :', 'Enter IFSC Code ', _ifscCodeController,
                                       (value) {
                                     // Handle the changed text
                                     _IFSCcode = value;
@@ -799,7 +807,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Bank Name :',
                                   'Bank Name ',
-                                  '',
+                                  _bankNameController,
                                       (value) {
                                     // Handle the changed text
                                     _BankName = value;
@@ -811,7 +819,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
                                 _buildTextField(
                                   'Branch Name :',
                                   'Branch Name',
-                                  '',
+                                  _branchNameController,
                                       (value) {
                                     // Handle the changed text
                                         _BranchName = value;
@@ -881,8 +889,98 @@ class _AddFarmerState extends State<AddFarmerScreen> {
         ));
   }
 
-  Widget _buildDropdown(String label, String? selectedValue, List<String> items,
-      ValueChanged<String?> onChanged) {
+
+
+
+  Widget _buildDropdown(
+      String label, String? selectedValue, List<String> items, ValueChanged<String?> onChanged) {
+    // Ensure that selectedValue is either null or matches one of the items
+    String? validatedSelectedValue =
+    items.contains(selectedValue) ? selectedValue : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(color: Colors.grey),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: validatedSelectedValue,
+              isExpanded: true,
+              onChanged: (String? newValue) {
+                onChanged(newValue);
+              },
+              items: items.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildTextField(
+      String label,
+      String hint,
+      TextEditingController controller,
+      ValueChanged<String?> onChanged, {
+        bool isPhone = false,
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(color: Colors.grey),
+          ),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: hint,
+            ),
+            keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
+            onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+/*  Widget _buildDropdown(String label, String? selectedValue, List<String> items, ValueChanged<String?> onChanged) {
     // Ensure that selectedValue is either null or matches one of the items
     String? validatedSelectedValue =
     items.contains(selectedValue) ? selectedValue : null;
@@ -964,7 +1062,7 @@ class _AddFarmerState extends State<AddFarmerScreen> {
         ),
       ],
     );
-  }
+  }*/
 
 // Method to build the date picker field
   Widget _buildDatePickerField(
